@@ -9,18 +9,18 @@ function random(min,max) {
   return num;
 }
 
-function Ball(x, y, velX, velY) {
+function Ball(x, y, velocityX, velocityY) {
 	this.x = x;
 	this.y = y;
-	this.velX = velX;
-	this.velY = velY;	
+	this.velocityX = velocityX;
+	this.velocityY = velocityY;	
 };
 
 Ball.prototype.draw = function() {
 	ctx.beginPath();
 	ctx.fillStyle = 'red';
-	ctx.arc(this.x, this.y, 15, 0, 2 * Math.PI)
-	ctx.fill()
+	ctx.arc(this.x, this.y, 15, 0, 2 * Math.PI);
+	ctx.fill();
 };
 
 function Player(name, points, which) {
@@ -31,7 +31,7 @@ function Player(name, points, which) {
 };
 
 Player.prototype.givePoints = function() {
-	this.points += 1
+	this.points += 1;
 };
 
 function Rectangle(x, y, color, owner, upKey, downKey) {
@@ -43,29 +43,28 @@ function Rectangle(x, y, color, owner, upKey, downKey) {
 	this.downKey = downKey;
 	this.width = 6;
 	this.height = 80;
-	if (this.owner === 1) {
-		this.edgeX = this.x + this.width
-	} else {
-		this.edgeX = this.x
-	}
+	if (this.owner === 1) 
+		this.edgeX = this.x + this.width;
+	else 
+		this.edgeX = this.x;
 };
 
 Ball.prototype.update = function(rect) {
-	if (rect.owner === 1) {
+	if (rect.owner.which === 1) {
 		if ((this.x - 15) <= rect.edgeX && (this.y >= rect.y && this.y <= (rect.y+80))) {
-			this.velX = -(this.velX);
+			this.velocityX = -(this.velocityX);
 			console.log('IAAM HERE')
 	  }  
 	  } else {
 		if ((this.x + 15) >= rect.edgeX && (this.y >= rect.y && this.y <= (rect.y+80))) {
-			this.velX = -(this.velX);
+			this.velocityX = -(this.velocityX);
 			console.log('IAAM HERE')
 	  }  
 		  
 	  }
 	  if((this.x + 15) >= width) {
 	    // points for 1st or 2nd player
-		this.velX = -(this.velX);
+		this.velocityX = -(this.velocityX);
 		console.log('points for 1')
 		//this.x = width/2;
 		//this.y = height/2;
@@ -73,22 +72,18 @@ Ball.prototype.update = function(rect) {
 
 	  if((this.x - 15) <= 0) {
 	    // points for 1st or 2nd player
-		this.velX = -(this.velX);
+		this.velocityX = -(this.velocityX);
 		console.log('points for 2')
 	  }
 
 	  if((this.y + 15) >= height) {
-	    this.velY = -(this.velY);
+	    this.velocityY = -(this.velocityY);
 	  }
-
 	  if((this.y - 15) <= 0) {
-	    this.velY = -(this.velY);
-		
+	    this.velocityY = -(this.velocityY);
 	  }
-
-
-	  this.x += this.velX;
-	  this.y += this.velY;
+	  this.x += this.velocityX;
+	  this.y += this.velocityY;
 	
 };
 
@@ -102,7 +97,7 @@ Rectangle.prototype.draw = function() {
 Rectangle.prototype.monitoreKeys = function() {
 	let self = this;
 
-
+	
 	window.onkeydown = function(e) {
 
 		if (e.keyCode === self.upKey) {
@@ -115,31 +110,29 @@ Rectangle.prototype.monitoreKeys = function() {
 	}
 }
 Rectangle.prototype.collision = function(ball) {
-	let dx = this.x - ball.x;
-	let dy = this.y - ball.y;
-	let distance = Math.sqrt(dx * dx + dy * dy);
-	// radius of ball 15, half of height of rectangle 3, half of width of rectangle 40
-	if (distance<=Math.sqrt(Math.pow(18,2)+Math.pow(40,2))) {
-		this.color = 'red';	
-	} else {
-		this.color = 'black';
-	}
+//empty
 };
-
+const keyW = 87;
+const keyS = 83;
+const arrowUp = 38;
+const arrowDown = 40;
+const offset = 10;
 let ball = new Ball(width/2, height/2, random(2, 3), random(1, 2))
-let p1 = new Player(prompt('Player 1, please give a name: '), 0, 1);
-let p2 = new Player(prompt('Player 2, please give a name: '), 0, 2);
-let rect1 = new Rectangle(10,height/2,'black',p1, 87, 83)
-let rect2 = new Rectangle(width-10,height/2, 'blue',p2, 38, 40)
+let player1 = new Player(prompt('Player 1, please give a name: '), 0, 1);
+let player2 = new Player(prompt('Player 2, please give a name: '), 0, 2);
+let rect1 = new Rectangle(offset, height/2,'white', player1, keyW, keyS)
+let rect2 = new Rectangle(width-offset, height/2, 'blue', player2, arrowUp, arrowDown)
 function loop() {
 	ctx.fillStyle = 'rgba(0,0,0,0.25)';
 	ctx.fillRect(0,0,width,height);
 	ball.draw();
 	rect1.draw();
 	rect2.draw();
+	ball.update(rect1);
 	ball.update(rect2);
-
 	rect2.monitoreKeys();
+	rect1.monitoreKeys();
+
 	requestAnimationFrame(loop);
 }
 
