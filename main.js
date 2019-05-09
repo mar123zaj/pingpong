@@ -94,7 +94,7 @@ Rectangle.prototype.draw = function() {
 	ctx.fill();
 };
 
-Rectangle.prototype.monitoreKeys = function() {
+Rectangle.prototype.monitorKeys = function() {
 	let self = this;
 
 	
@@ -130,8 +130,8 @@ function loop() {
 	rect2.draw();
 	ball.update(rect1);
 	ball.update(rect2);
-	rect2.monitoreKeys();
-	rect1.monitoreKeys();
+	rect2.monitorKeys();
+	rect1.monitorKeys();
 
 	requestAnimationFrame(loop);
 }
