@@ -5,7 +5,7 @@ let width = canvas.width = window.innerWidth;
 let height = canvas.height = window.innerHeight;
 
 function random(min,max) {
-  var num = Math.floor(Math.random()*(max-min)) + min;
+  let num = Math.floor(Math.random()*(max-min)) + min;
   return num;
 }
 
@@ -41,19 +41,40 @@ function Rectangle(x, y, color, owner, upKey, downKey) {
 	this.owner = owner;
 	this.upKey = upKey;
 	this.downKey = downKey;
+	this.width = 6;
+	this.height = 80;
+	if (this.owner === 1) {
+		this.edgeX = this.x + this.width
+	} else {
+		this.edgeX = this.x
+	}
 };
 
 Ball.prototype.update = function(rect) {
+	if (rect.owner === 1) {
+		if ((this.x - 15) <= rect.edgeX && (this.y >= rect.y && this.y <= (rect.y+80))) {
+			this.velX = -(this.velX);
+			console.log('IAAM HERE')
+	  }  
+	  } else {
+		if ((this.x + 15) >= rect.edgeX && (this.y >= rect.y && this.y <= (rect.y+80))) {
+			this.velX = -(this.velX);
+			console.log('IAAM HERE')
+	  }  
+		  
+	  }
 	  if((this.x + 15) >= width) {
 	    // points for 1st or 2nd player
 		this.velX = -(this.velX);
-		console.log('points')
+		console.log('points for 1')
+		//this.x = width/2;
+		//this.y = height/2;
 	  }
 
 	  if((this.x - 15) <= 0) {
 	    // points for 1st or 2nd player
 		this.velX = -(this.velX);
-		console.log('')
+		console.log('points for 2')
 	  }
 
 	  if((this.y + 15) >= height) {
@@ -62,25 +83,19 @@ Ball.prototype.update = function(rect) {
 
 	  if((this.y - 15) <= 0) {
 	    this.velY = -(this.velY);
+		
+	  }
 
-	  }
-	
-	  let dx = this.x - rect.x;
-	  let dy = this.y - rect.y;
-	  let distance = Math.sqrt(dx * dx + dy * dy);
-	  // radius of ball 15, half of height of rectangle 3, half of width of rectangle 40
-	  if (distance<=Math.sqrt(Math.pow(18,2)+Math.pow(40,2))) {
-	    this.velX = -(this.velX);
-	  }
-	    this.x += this.velX;
-	    this.y += this.velY;
+
+	  this.x += this.velX;
+	  this.y += this.velY;
 	
 };
 
 Rectangle.prototype.draw = function() {
 	ctx.beginPath();
 	ctx.fillStyle = this.color;
-	ctx.rect(this.x, this.y, 6, 80);
+	ctx.rect(this.x, this.y, this.width, this.height);
 	ctx.fill();
 };
 
@@ -122,7 +137,6 @@ function loop() {
 	ball.draw();
 	rect1.draw();
 	rect2.draw();
-	ball.update(rect1);
 	ball.update(rect2);
 
 	rect2.monitoreKeys();
