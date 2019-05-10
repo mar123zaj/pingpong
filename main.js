@@ -3,6 +3,7 @@ let ctx = canvas.getContext('2d');
 
 let width = canvas.width = window.innerWidth;
 let height = canvas.height = window.innerHeight;
+let result = document.querySelector('h1');
 
 function random(min,max) {
   let num = Math.floor(Math.random()*(max-min)) + min;
@@ -23,8 +24,7 @@ Ball.prototype.draw = function() {
 	ctx.fill();
 };
 
-function Player(name, points, which) {
-	this.user = name;
+function Player(points, which) {
 	this.points = points;
 	// 1st or 2nd player
 	this.which = which;
@@ -53,27 +53,29 @@ Ball.prototype.update = function(rect) {
 	if (rect.owner.which === 1) {
 		if ((this.x - 15) <= rect.edgeX && (this.y >= rect.y && this.y <= (rect.y+80))) {
 			this.velocityX = -(this.velocityX);
-			console.log('IAAM HERE')
 	  }  
 	  } else {
 		if ((this.x + 15) >= rect.edgeX && (this.y >= rect.y && this.y <= (rect.y+80))) {
 			this.velocityX = -(this.velocityX);
-			console.log('IAAM HERE')
 	  }  
 		  
 	  }
 	  if((this.x + 15) >= width) {
 	    // points for 1st or 2nd player
 		this.velocityX = -(this.velocityX);
-		console.log('points for 1')
-		//this.x = width/2;
-		//this.y = height/2;
+		player1.points += 1;
+		result.textContent = `${player1.points}:${player2.points}`;
+		ball.x = width/2;
+		ball.y = height/2;
 	  }
 
 	  if((this.x - 15) <= 0) {
 	    // points for 1st or 2nd player
 		this.velocityX = -(this.velocityX);
-		console.log('points for 2')
+		player2.points += 1;
+		result.textContent = `${player1.points}:${player2.points}`;
+		ball.x = width/2;
+		ball.y = height/2;
 	  }
 
 	  if((this.y + 15) >= height) {
@@ -94,21 +96,27 @@ Rectangle.prototype.draw = function() {
 	ctx.fill();
 };
 
-Rectangle.prototype.monitorKeys = function() {
-	let self = this;
-
+Rectangle.prototype.checkBounds = function() {
+	if (this.y<=0) 
+		this.y = 0;
 	
-	window.onkeydown = function(e) {
-
-		if (e.keyCode === self.upKey) {
-
-			self.y -= 15;
-		} else if (e.keyCode === self.downKey) {
-
-			self.y += 15;
-		}
-	}
+	if ((this.y+this.height)>=height)
+		this.y = height - this.height;
 }
+
+function monitorKeys() {
+	window.onkeydown = function(e) {
+		if (e.keyCode === rect1.upKey) 
+			rect1.y -= 15;
+		 else if (e.keyCode === rect1.downKey) 
+			rect1.y += 15;
+		 else if (e.keyCode === rect2.upKey) 
+			rect2.y -= 15;
+		 else if (e.keyCode === rect2.downKey) 
+			rect2.y += 15;
+	};
+};
+
 Rectangle.prototype.collision = function(ball) {
 //empty
 };
@@ -117,9 +125,10 @@ const keyS = 83;
 const arrowUp = 38;
 const arrowDown = 40;
 const offset = 10;
+const startPoints = 0;
 let ball = new Ball(width/2, height/2, random(2, 3), random(1, 2))
-let player1 = new Player(prompt('Player 1, please give a name: '), 0, 1);
-let player2 = new Player(prompt('Player 2, please give a name: '), 0, 2);
+let player1 = new Player(startPoints, 1);
+let player2 = new Player(startPoints, 2);
 let rect1 = new Rectangle(offset, height/2,'white', player1, keyW, keyS)
 let rect2 = new Rectangle(width-offset, height/2, 'blue', player2, arrowUp, arrowDown)
 function loop() {
@@ -128,10 +137,11 @@ function loop() {
 	ball.draw();
 	rect1.draw();
 	rect2.draw();
+	rect1.checkBounds();
+	rect2.checkBounds();
 	ball.update(rect1);
 	ball.update(rect2);
-	rect2.monitorKeys();
-	rect1.monitorKeys();
+	monitorKeys();
 
 	requestAnimationFrame(loop);
 }
